@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .controles {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .formulario {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .formulario h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .campo {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .productos-container {
+            margin-top: 20px;
+        }
+
+        .producto-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .producto-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .producto-imagen {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            flex-shrink: 0;
+        }
+
+        .producto-info {
+            flex: 1;
+        }
+
+        .producto-nombre {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .producto-precio {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .mensaje {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .mensaje-exito {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .mensaje-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .cargando {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .botones-orden {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .btn-orden {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .btn-orden:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-orden.activo {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Gestión de Productos</h1>
+        <p class="subtitle">Sistema de inventario simple</p>
+
+        <div class="controles">
+            <h3>📋 Ver Productos</h3>
+            <button onclick="listarProductos()">LISTA DE ARTÍCULOS</button>
+            
+            <div id="botonesOrden" style="display: none;">
+                <div class="botones-orden">
+                    <button class="btn-orden" onclick="ordenarPor('nombre')">
+                        Ordenar por Nombre (A-Z)
+                    </button>
+                    <button class="btn-orden" onclick="ordenarPor('precio-asc')">
+                        Ordenar por Precio (Menor a Mayor)
+                    </button>
+                    <button class="btn-orden" onclick="ordenarPor('precio-desc')">
+                        Ordenar por Precio (Mayor a Menor)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultados"></div>
+
+        <div class="formulario">
+            <h3>➕ Agregar Nuevo Producto</h3>
+            
+            <div class="campo">
+                <label for="nombreProducto">Nombre del Producto:</label>
+                <input type="text" id="nombreProducto" placeholder="Ej: Zapatillas">
+            </div>
+
+            <div class="campo">
+                <label for="precioProducto">Precio:</label>
+                <input type="number" id="precioProducto" placeholder="Ej: 25990" min="1">
+            </div>
+
+            <button onclick="agregarProducto()">AGREGAR NUEVO PRODUCTO</button>
+        </div>
+
+        <div id="mensajes"></div>
+    </div>
+
+    <script>
+        
+        const API_URL = 'http://localhost:3000';
+        let productosActuales = [];  
+        let ordenActual = 'original'; 
+
+        const emojisProductos = ['👟', '👕', '👖', '🧦', '🧥', '🧢', '🧣', '🧤', '🕶️', '🎒'];
+
+        
+        async function listarProductos() {
+            const resultadosDiv = document.getElementById('resultados');
+            resultadosDiv.innerHTML = '<p class="cargando">Cargando productos...</p>';
+
+            try {
+                const respuesta = await fetch(`${API_URL}/productos`);
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    throw new Error(datos.mensaje || 'Error al cargar productos');
+                }
+
+                productosActuales = datos.productos;
+
+                mostrarProductos(productosActuales);
+
+                document.getElementById('botonesOrden').style.display = 'block';
+
+            } catch (error) {
+                resultadosDiv.innerHTML = `
+                    <div class="mensaje mensaje-error">
+                        ❌ Error: ${error.message}
+                        <br><small>Verifica que el servidor esté corriendo en ${API_URL}</small>
+                    </div>
+                `;
+            }
+        }
+
+       
+        function mostrarProductos(productos) {
+            const resultadosDiv = document.getElementById('resultados');
+            
+            if (productos.length === 0) {
+                resultadosDiv.innerHTML = '<p>No hay productos disponibles</p>';
+                return;
+            }
+
+            let html = `
+                <div class="productos-container">
+                    <h3>Productos disponibles (${productos.length})</h3>
+            `;
+
+            productos.forEach((producto, index) => {
+                const emoji = emojisProductos[index % emojisProductos.length];
+                
+                html += `
+                    <div class="producto-card">
+                        <div class="producto-imagen">${emoji}</div>
+                        <div class="producto-info">
+                            <div class="producto-nombre">${producto.nombre}</div>
+                            <div class="producto-precio">$${producto.precio.toLocaleString('es-CL')}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            resultadosDiv.innerHTML = html;
+        }
+
+        
+        function ordenarPor(tipo) {
+            if (productosActuales.length === 0) {
+                alert('Primero debes cargar los productos');
+                return;
+            }
+
+            let productosOrdenados = [...productosActuales];
+
+            if (tipo === 'nombre') {
+                productosOrdenados.sort((a, b) => {
+                    return a.nombre.localeCompare(b.nombre);
+                });
+            } 
+            else if (tipo === 'precio-asc') {
+                productosOrdenados.sort((a, b) => a.precio - b.precio);
+            }
+            else if (tipo === 'precio-desc') {
+                productosOrdenados.sort((a, b) => b.precio - a.precio);
+            }
+
+            mostrarProductos(productosOrdenados);
+            
+            ordenActual = tipo;
+        }
+
+        
+        async function agregarProducto() {
+            const nombre = document.getElementById('nombreProducto').value.trim();
+            const precio = document.getElementById('precioProducto').value.trim();
+
+            if (!nombre || !precio) {
+                mostrarMensaje('Por favor completa todos los campos', 'error');
+                return;
+            }
+
+            if (isNaN(precio) || parseInt(precio) <= 0) {
+                mostrarMensaje('El precio debe ser un número positivo', 'error');
+                return;
+            }
+
+            try {
+                const datos = {
+                    nombre: nombre,
+                    precio: parseInt(precio)
+                };
+
+                const respuesta = await fetch(`${API_URL}/productos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                const resultado = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    throw new Error(resultado.mensaje || 'Error al agregar producto');
+                }
+
+                mostrarMensaje(`✅ ${resultado.mensaje}`, 'exito');
+
+                document.getElementById('nombreProducto').value = '';
+                document.getElementById('precioProducto').value = '';
+
+                setTimeout(() => {
+                    listarProductos();
+                }, 1000);
+
+            } catch (error) {
+                mostrarMensaje(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        
+        function mostrarMensaje(texto, tipo) {
+            const mensajesDiv = document.getElementById('mensajes');
+            const clase = tipo === 'exito' ? 'mensaje-exito' : 'mensaje-error';
+            
+            mensajesDiv.innerHTML = `<div class="mensaje ${clase}">${texto}</div>`;
+
+            setTimeout(() => {
+                mensajesDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        
+        document.getElementById('precioProducto').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                agregarProducto();
+            }
+        });
+    </script>
+</body>
+</html>
